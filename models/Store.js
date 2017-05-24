@@ -12,16 +12,24 @@ const storeSchema = new mongoose.Schema({
 		type: {type: String, default: 'Point'}, 
 		coordinates: [{type: Number, required: "Must supply coordinates!"}], 
 		address: {type: String, required: "Must supply an address!"} 
-	}
+	},
+	photo: String
 });
 
-storeSchema.pre('save', function(next) {
-	if(!this.isModified('name')) {
-		return next(); // same as:
+storeSchema.pre('save', async function(next) {
+	if(!this.isModified('name')) return next(); // same as:
 		// next(); skip it
 		// return; stop this function from running
-	}
 	this.slug = slug(this.name);
+
+	// find other stores that hava a same slug
+	const slugRegEx = new RegExp(`^(${thisslug})((-[0-9]*$)?)$`, 'i');
+	const storesWithSlug = await this.constructor.find({ slug: slugRegEx});
+
+	if(storesWithSlug.length) {
+		this.slug = `${this.slug}-${storesWithSlug.length} + 1`;
+	} 
+
 	next();
 })
 

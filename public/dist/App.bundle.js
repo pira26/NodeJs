@@ -82,7 +82,8 @@ function autocomplete(input, latInput, lngInput) {
 	var dropdown = new google.maps.places.Autocomplete(input);
 	dropdown.addEventListener('place_changed', function () {
 		var place = dropdown.getPlace();
-		lastInput.value = place.geometry.location.lat();
+		console.log(place);
+		latInput.value = place.geometry.location.lat();
 		lngInput.value = place.geometry.location.lng();
 	});
 
