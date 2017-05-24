@@ -1,0 +1,14 @@
+//- .container 
+//- 	- const upper = name.toUpperCase(); 	
+//- 	div
+//- 		h1 TEST
+//- 		p.hello hello #{upper} !
+//- 	div 
+//- 		#hola hola #{name.toUpperCase()} !
+//- 	.img
+//- 		img(src="https://cdn-images-1.medium.com/max/800/0*iV1WRpCRP8OIazzY.jpg" alt=`${name}`) 
+
+extends layout 
+
+block content 
+	h2 Sales end in #{h.moment().endOf('day').fromNow()}
