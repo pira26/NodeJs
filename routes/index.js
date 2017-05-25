@@ -22,11 +22,18 @@ router.get('/reverse/:name', (req, res) => {
 	res.send(reverse);
 });
 */
-
+/* Basic Route */
 router.get('/', catchErrors(storeController.getStores));
 
+/* Stores Routes */
 router.get('/stores', catchErrors(storeController.getStores));
 
+router.get('/stores/:id/edit', catchErrors(storeController.editStore));
+
+/* Store Route */
+router.get('/store/:slug', catchErrors(storeController.getStoreBySlug));
+
+/* Add Route */
 router.get('/add', authController.isLoggedIn, storeController.addStore);
 router.post('/add', 
   storeController.upload, 
@@ -34,24 +41,22 @@ router.post('/add',
   catchErrors(storeController.createStore)
 );
 
-
-router.get('/stores/:id/edit', catchErrors(storeController.editStore));
-
 router.post('/add/:id', 
   storeController.upload, 
   catchErrors(storeController.resize),
   catchErrors(storeController.updateStore)
 );
 
-router.get('/store/:slug', catchErrors(storeController.getStoreBySlug));
-
+/* Tags Route */
 router.get('/tags', catchErrors(storeController.getStoresByTag));
 
 router.get('/tags/:tag', catchErrors(storeController.getStoresByTag));
 
+/* Login Route */
 router.get('/login', userController.loginForm);
 router.post('/login', authController.login);
 
+/* Register Route */
 router.get('/register', userController.registerForm);
 router.post('/register', 
   userController.validateRegister,
@@ -59,6 +64,11 @@ router.post('/register',
   authController.login
 );
 
+/* Logout Route */
 router.get('/logout', authController.logout);
+
+/* Account Route */
+router.get('/account', authController.isLoggedIn, userController.account);
+router.post('/account', catchErrors(userController.updateAccount));
 
 module.exports = router;
