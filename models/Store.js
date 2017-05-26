@@ -3,17 +3,22 @@ mongoose.Promise = global.Promise;
 const slug = require('slugs');
 
 const storeSchema = new mongoose.Schema({
-	name: {type: String, trim: true, required: "Please enter a valid name!"},
+	name: { type: String, trim: true, required: "Please enter a valid name!" },
 	slug: String,
-	description: {type: String, trim: true},
+	description: { type: String, trim: true },
 	tags: [String],
-	created: {type: Date, default: Date.now},
+	created: { type: Date, default: Date.now },
 	location: {
-		type: {type: String, default: 'Point'}, 
-		coordinates: [{type: Number, required: "Must supply coordinates!"}], 
-		address: {type: String, required: "Must supply an address!"} 
+		type: { type: String, default: 'Point' }, 
+		coordinates: [{ type: Number, required: "Must supply coordinates!" }], 
+		address: { type: String, required: "Must supply an address!" } 
 	},
-	photo: String
+	photo: String,
+	author: { 
+		type: mongoose.Schema.ObjectId, 
+		ref: 'User',
+		required: 'Must supply an author!'
+	}
 });
 
 storeSchema.pre('save', async function(next) {
@@ -24,7 +29,7 @@ storeSchema.pre('save', async function(next) {
 
 	// find other stores that hava a same slug
 	const slugRegEx = new RegExp(`^(${thisslug})((-[0-9]*$)?)$`, 'i');
-	const storesWithSlug = await this.constructor.find({ slug: slugRegEx});
+	const storesWithSlug = await this.constructor.find({ slug: slugRegEx });
 
 	if(storesWithSlug.length) {
 		this.slug = `${this.slug}-${storesWithSlug.length} + 1`;
@@ -37,9 +42,9 @@ storeSchema.statics.getTagsList = function() {
 	return this.aggregate([
 		{ $unwind: '$tags' },
 		// separate each tags per stores
-		{ $group: {_id: '$tags', count: {$sum: 1}} },
+		{ $group: { _id: '$tags', count: { $sum: 1 } } },
 		// count the number of tags
-		{ $sort: {count: -1} }
+		{ $sort: { count: -1 } }
 	]);
 	// like findOne which returns an array of possible operators
 }

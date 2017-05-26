@@ -4,8 +4,8 @@ block content
 	.inner
 		h2 Edit Your Account 
 		form(action='/account' method='POST')
-			laber(for='name') Name
+			label(for='name') Name
 			input(type='text' name='name' value=user.name)
-			laber(for='email') Email
+			label(for='email') Email
 			input(type='email' name='email' value=user.email)
 			input.button(type='submit' value='Update My Account')
