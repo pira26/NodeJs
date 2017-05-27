@@ -3,6 +3,7 @@ const router = express.Router();
 const storeController = require('../controllers/storeController');
 const userController = require('../controllers/userController');
 const authController = require('../controllers/authController');
+const reviewController = require('../controllers/reviewController');
 const { catchErrors } = require('../handlers/errorHandlers'); 
 /*
 router.get('/', (req, res) => {
@@ -91,6 +92,22 @@ router.post('/account/reset/:token',
 /* Map Route */
 router.get('/map', storeController.mapPage);
 
+/* Hearts Route */
+router.get('/hearts',
+  authController.isLoggedIn,
+  catchErrors(storeController.getHearts)
+);
+
+/* Reviews Route */
+router.post('/reviews/:id',
+  authController.isLoggedIn,
+  catchErrors(reviewController.addReview)  
+);
+
+/* Top Routes */
+router.get('/top', catchErrors(storeController.getTopStores));
+
+
 /* API */
 
 /* Search API */
@@ -98,5 +115,8 @@ router.get('/api/search', catchErrors(storeController.searchStores));
 
 /* Map API */
 router.get('/api/stores/near', catchErrors(storeController.mapStores));
+
+/* Heart API */
+router.post('/api/stores/:id/heart', catchErrors(storeController.heartStore));
 
 module.exports = router;

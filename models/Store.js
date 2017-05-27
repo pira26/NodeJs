@@ -3,15 +3,34 @@ mongoose.Promise = global.Promise;
 const slug = require('slugs');
 
 const storeSchema = new mongoose.Schema({
-	name: { type: String, trim: true, required: "Please enter a valid name!" },
+	name: {
+		type: String, 
+		trim: true, 
+		required: "Please enter a valid name!" 
+	},
 	slug: String,
-	description: { type: String, trim: true },
+	description: {
+		type: String,
+		trim: true
+	},
 	tags: [String],
-	created: { type: Date, default: Date.now },
+	created: {
+		type: Date,
+		default: Date.now
+	},
 	location: {
-		type: { type: String, default: 'Point' }, 
-		coordinates: [{ type: Number, required: "Must supply coordinates!" }], 
-		address: { type: String, required: "Must supply an address!" } 
+		type: {
+			type: String, 
+			default: 'Point'
+		}, 
+		coordinates: [{ 
+			type: Number, 
+			required: "Must supply coordinates!" 
+		}], 
+		address: {
+			type: String, 
+			required: "Must supply an address!" 
+		} 
 	},
 	photo: String,
 	author: { 
@@ -19,6 +38,10 @@ const storeSchema = new mongoose.Schema({
 		ref: 'User',
 		required: 'Must supply an author!'
 	}
+},
+{
+	toJSON: { virtuals: true },
+	toObject: { virtuals: true }
 });
 
 // Define our indexes for mongoDB
@@ -57,6 +80,64 @@ storeSchema.statics.getTagsList = function() {
 		{ $sort: { count: -1 } }
 	]);
 	// like findOne which returns an array of possible operators
-}
+};
+
+storeSchema.statics.getTopStores = function() {
+	return this.aggregate([
+		// Lookup Stores and populate their reviews
+		{
+			$lookup: {
+				from: 'reviews', 
+				localField:'_id', 
+				foreignField: 'store', 
+				as: 'reviews'
+			}
+		},
+		// Filter for items that have 2 or more reviews
+		{
+			$match: {
+				'reviews.1' : {
+					$exists: true
+				}
+			}
+		},
+		// Add average reviews field
+		{
+			$project: {
+				photo: '$$ROOT.photo',
+				name: '$$ROOT.name',
+				reviews: '$$ROOT.reviews',
+				slug: '$$ROOT.slug',
+				averageRating: {
+					$avg: '$reviews.rating'
+				}
+			}
+		},
+		// Sort by our new field, highest reviews first and limit at 10
+		{
+			$sort: {
+				averageRating: -1 
+			}
+		},
+		{ 
+			$limit: 10
+		}
+	]);
+};
+
+// Find reviews where stores_id property === reviews store property
+storeSchema.virtual('reviews', {
+	ref: 'Review',
+	localField: '_id', // which field on the store
+	foreignField: 'store' // which field on the review
+});
+
+function autopopulate(next) {
+	this.populate('reviews');
+	next();
+};
+
+storeSchema.pre('find', autopopulate);
+storeSchema.pre('findOne', autopopulate);
 
 module.exports = mongoose.model('Store', storeSchema);
