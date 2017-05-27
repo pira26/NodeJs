@@ -1,14 +1,17 @@
 {
-  "name": "dang-thats-delicious",
+  "name": "learn_nodejs_with_wes_bos",
   "version": "0.0.0",
   "private": true,
   "engines": {
     "node": ">= 7.6.0"
   },
+  "now": {
+    "dotenv": "variables.env.now"
+  },
   "scripts": {
-    "prod": "node ./start.js",
+    "start": "node ./start.js",
     "watch": "nodemon ./start.js --ignore public/",
-    "start": "concurrently \"yarn run watch\" \"yarn run assets\" --names \"💻,📦\" --prefix name",
+    "dev": "concurrently \"yarn run watch\" \"yarn run assets\" --names \"💻,📦\" --prefix name",
     "assets": "webpack -w --display-max-modules 0",
     "sample": "node ./data/load-sample-data.js",
     "delete": "node ./data/load-sample-data.js --delete",
