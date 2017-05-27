@@ -21,6 +21,16 @@ const storeSchema = new mongoose.Schema({
 	}
 });
 
+// Define our indexes for mongoDB
+storeSchema.index({
+	name: 'text',
+	description: 'text'
+});
+
+storeSchema.index({
+	location: '2dsphere'
+});
+
 storeSchema.pre('save', async function(next) {
 	if(!this.isModified('name')) return next(); // same as:
 		// next(); skip it
@@ -28,7 +38,7 @@ storeSchema.pre('save', async function(next) {
 	this.slug = slug(this.name);
 
 	// find other stores that hava a same slug
-	const slugRegEx = new RegExp(`^(${thisslug})((-[0-9]*$)?)$`, 'i');
+	const slugRegEx = new RegExp(`^(${this.slug})((-[0-9]*$)?)$`, 'i');
 	const storesWithSlug = await this.constructor.find({ slug: slugRegEx });
 
 	if(storesWithSlug.length) {

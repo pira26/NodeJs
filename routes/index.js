@@ -22,6 +22,10 @@ router.get('/reverse/:name', (req, res) => {
 	res.send(reverse);
 });
 */
+
+
+/* Routes */ 
+
 /* Basic Route */
 router.get('/', catchErrors(storeController.getStores));
 
@@ -83,5 +87,16 @@ router.post('/account/reset/:token',
   authController.confirmedPasswords, 
   catchErrors(authController.update)
 );
+
+/* Map Route */
+router.get('/map', storeController.mapPage);
+
+/* API */
+
+/* Search API */
+router.get('/api/search', catchErrors(storeController.searchStores));
+
+/* Map API */
+router.get('/api/stores/near', catchErrors(storeController.mapStores));
 
 module.exports = router;
